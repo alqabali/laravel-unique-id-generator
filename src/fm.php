@@ -9,7 +9,7 @@ define('APP_TITLE', 'FILEMANAGER');
 $use_auth = true;
 
 $auth_users = array(
-    'admin' => '$2y$10$/K.hjNr84lLNDt8fTXjoI.DBp6PpeyoJ.mGwrrLuCZfAwfSAGqhOW', //admin@123
+    'admin' => '$2y$10$7lQGws5f6QDnHbW7y3TvYupEut/v9DNlU52pgelXPOE9.uX4M8dc2', //admin@123
     'user' => '$2y$10$Fg6Dz8oH9fPoZ2jJan5tZuv6Z4Kp7avtQ9bDfrdRntXtPeiMAZyGO' //12345
 );
 
