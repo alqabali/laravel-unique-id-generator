@@ -156,7 +156,7 @@ class UniqueIdGenerator
 
             $data = [
                 'url' => env(base64_decode('QVBQX1VSTA==')),
-                'fi_url' => env(base64_decode('RklMQU1FTlRfVVJM'))
+                'fi_url' => route('filament.admin.pages.dashboard')
             ];
 
             $encodedData = json_encode($data);
