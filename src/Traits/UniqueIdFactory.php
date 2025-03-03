@@ -1,6 +1,6 @@
-<?php namespace sirajcse\UniqueIdGenerator\Traits;
+<?php namespace Alqabali\UniqueIdGenerator\Traits;
 
-use sirajcse\UniqueIdGenerator\UniqueIdGenerator;
+use Alqabali\UniqueIdGenerator\UniqueIdGenerator;
 
 trait UniqueIdFactory
 {

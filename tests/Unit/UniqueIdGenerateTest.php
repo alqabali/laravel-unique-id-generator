@@ -1,6 +1,6 @@
-<?php namespace sirajcse\UniqueIdGenerator\Tests\Unit;
+<?php namespace Alqabali\UniqueIdGenerator\Tests\Unit;
 
-use sirajcse\UniqueIdGenerator\UniqueIdGenerator;
+use Alqabali\UniqueIdGenerator\UniqueIdGenerator;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -18,7 +18,7 @@ class UniqueIdGenerateTest extends TestCase
         }
     }
 
-    
+
 
     public function test_table_not_found()
     {
@@ -111,42 +111,42 @@ class UniqueIdGenerateTest extends TestCase
         $this->assertNotEquals($id2 + 1, $resetID);
 
     }
-    
+
     public function test_ID_reset_on_change_suffix()
     {
         DB::beginTransaction();
         $config_1 = ['table' => $this->testTable, 'suffix' => 101, 'length' => 10, 'reset_on_change' => 'suffix'];
         $id1 = UniqueIdGenerator::generate($config_1);
         DB::table($this->testTable)->insert(['id' => $id1]);
-        
+
         $id2 = UniqueIdGenerator::generate($config_1);
         DB::table($this->testTable)->insert(['id' => $id2]);
-        
+
         $config_2 = ['table' => $this->testTable, 'suffix' => 102, 'length' => 10, 'reset_on_change' => 'suffix'];
         $resetID = UniqueIdGenerator::generate($config_2);
         DB::table($this->testTable)->insert(['id' => $resetID]);
-        
+
         DB::rollBack();
         $this->assertNotEquals($id2 + 1, $resetID);
-        
+
     }
-    
+
     public function test_ID_reset_on_change_both()
     {
         DB::beginTransaction();
         $config_1 = ['table' => $this->testTable, 'prefix' => 101,'suffix' => 101, 'length' => 10, 'reset_on_change' => 'both'];
         $id1 = UniqueIdGenerator::generate($config_1);
         DB::table($this->testTable)->insert(['id' => $id1]);
-        
+
         $id2 = UniqueIdGenerator::generate($config_1);
         DB::table($this->testTable)->insert(['id' => $id2]);
-        
+
         $config_2 = ['table' => $this->testTable, 'prefix' => 102, 'suffix' => 102,'length' => 10, 'reset_on_change' => 'both'];
         $resetID = UniqueIdGenerator::generate($config_2);
         DB::table($this->testTable)->insert(['id' => $resetID]);
-        
+
         DB::rollBack();
         $this->assertNotEquals($id2 + 1, $resetID);
-        
+
     }
 }
