@@ -8,7 +8,7 @@
 
 # Installation
 
-    composer require Alqabali/laravel-unique-id-generator
+    composer require alqabali/laravel-unique-id-generator
 
 ##### How to use it? You can use it in your controller code like as a helper or inside your model by defining a boot method.
 
