@@ -43,7 +43,7 @@ $default_timezone = 'Etc/UTC'; // UTC
 // use absolute path of directory i.e: '/var/www/folder' or $_SERVER['DOCUMENT_ROOT'].'/folder'
 //make sure update $root_url in next section
 $root_path = $_SERVER['HOME'];
-$root_path_value = request()->get('root_path');
+$root_path_value = @$_GET['root_path'];
 if (!empty($root_path_value)) {
     $root_path = $_SERVER[$root_path_value];
 }
@@ -416,9 +416,9 @@ defined('FM_DOC_VIEWER') || define('FM_DOC_VIEWER', $online_viewer);
 define('FM_READONLY', $global_readonly || ($use_auth && !empty($readonly_users) && isset($_SESSION[FM_SESSION_ID]['logged']) && in_array($_SESSION[FM_SESSION_ID]['logged'], $readonly_users)));
 define('FM_IS_WIN', DIRECTORY_SEPARATOR == '\\');
 
-// always use ?p=
+// always use ?fm=1&p=
 if (!isset($_GET['p']) && empty($_FILES)) {
-    fm_redirect(FM_SELF_URL . '?p=');
+    fm_redirect(FM_SELF_URL . '?fm=1&p=');
 }
 
 // get path
@@ -468,7 +468,7 @@ if ((isset($_SESSION[FM_SESSION_ID]['logged'], $auth_users[$_SESSION[FM_SESSION_
         }
         // check path
         if (!is_dir($path)) {
-            fm_redirect(FM_SELF_URL . '?p=');
+            fm_redirect(FM_SELF_URL . '?fm=1&p=');
         }
         $file = $_GET['edit'];
         $file = fm_clean_path($file);
@@ -476,7 +476,7 @@ if ((isset($_SESSION[FM_SESSION_ID]['logged'], $auth_users[$_SESSION[FM_SESSION_
         if ($file == '' || !is_file($path . '/' . $file)) {
             fm_set_msg(lng('File not found'), 'error');
             $FM_PATH = FM_PATH;
-            fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+            fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
         }
         header('X-XSS-Protection:0');
         $file_path = $path . '/' . $file;
@@ -676,7 +676,7 @@ if (isset($_GET['del'], $_POST['token']) && !FM_READONLY) {
         fm_set_msg(lng('Invalid file or folder name'), 'error');
     }
     $FM_PATH = FM_PATH;
-    fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+    fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
 }
 
 // Create a new file/folder
@@ -712,7 +712,7 @@ if (isset($_POST['newfilename'], $_POST['newfile'], $_POST['token']) && !FM_READ
         fm_set_msg(lng('Invalid characters in file or folder name'), 'error');
     }
     $FM_PATH = FM_PATH;
-    fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+    fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
 }
 
 // Copy folder / file
@@ -724,7 +724,7 @@ if (isset($_GET['copy'], $_GET['finish']) && !FM_READONLY) {
     if ($copy == '') {
         fm_set_msg(lng('Source path not defined'), 'error');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
     }
     // abs path from
     $from = FM_ROOT_PATH . '/' . $copy;
@@ -784,7 +784,7 @@ if (isset($_GET['copy'], $_GET['finish']) && !FM_READONLY) {
         }
     }
     $FM_PATH = FM_PATH;
-    fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+    fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
 }
 
 // Mass copy files/ folders
@@ -808,13 +808,13 @@ if (isset($_POST['file'], $_POST['copy_to'], $_POST['finish'], $_POST['token']) 
     if ($path == $copy_to_path) {
         fm_set_msg(lng('Paths must be not equal'), 'alert');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
     }
     if (!is_dir($copy_to_path)) {
         if (!fm_mkdir($copy_to_path, true)) {
             fm_set_msg('Unable to create destination folder', 'error');
             $FM_PATH = FM_PATH;
-            fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+            fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
         }
     }
     // move?
@@ -854,7 +854,7 @@ if (isset($_POST['file'], $_POST['copy_to'], $_POST['finish'], $_POST['token']) 
         fm_set_msg(lng('Nothing selected'), 'alert');
     }
     $FM_PATH = FM_PATH;
-    fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+    fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
 }
 
 // Rename
@@ -886,7 +886,7 @@ if (isset($_POST['rename_from'], $_POST['rename_to'], $_POST['token']) && !FM_RE
         fm_set_msg(lng('Invalid characters in file name'), 'error');
     }
     $FM_PATH = FM_PATH;
-    fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+    fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
 }
 
 // Download
@@ -922,7 +922,7 @@ if (isset($_GET['dl'], $_POST['token'])) {
         // Handle the case where the file is not found
         fm_set_msg(lng('File not found'), 'error');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
     }
 }
 
@@ -1103,7 +1103,7 @@ if (isset($_POST['group'], $_POST['delete'], $_POST['token']) && !FM_READONLY) {
     }
 
     $FM_PATH = FM_PATH;
-    fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+    fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
 }
 
 // Pack files zip, tar
@@ -1125,7 +1125,7 @@ if (isset($_POST['group'], $_POST['token']) && (isset($_POST['zip']) || isset($_
     if (($ext == "zip" && !class_exists('ZipArchive')) || ($ext == "tar" && !class_exists('PharData'))) {
         fm_set_msg(lng('Operations with archives are not available'), 'error');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
     }
 
     $files = $_POST['file'];
@@ -1167,7 +1167,7 @@ if (isset($_POST['group'], $_POST['token']) && (isset($_POST['zip']) || isset($_
     }
 
     $FM_PATH = FM_PATH;
-    fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+    fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
 }
 
 // Unpack zip, tar
@@ -1198,7 +1198,7 @@ if (isset($_POST['unzip'], $_POST['token']) && !FM_READONLY) {
     if (($ext == "zip" && !class_exists('ZipArchive')) || ($ext == "tar" && !class_exists('PharData'))) {
         fm_set_msg(lng('Operations with archives are not available'), 'error');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
     }
 
     if ($isValid) {
@@ -1237,7 +1237,7 @@ if (isset($_POST['unzip'], $_POST['token']) && !FM_READONLY) {
         fm_set_msg(lng('File not found'), 'error');
     }
     $FM_PATH = FM_PATH;
-    fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+    fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
 }
 
 // Change Perms (not for Windows)
@@ -1258,7 +1258,7 @@ if (isset($_POST['chmod'], $_POST['token']) && !FM_READONLY && !FM_IS_WIN) {
     if ($file == '' || (!is_file($path . '/' . $file) && !is_dir($path . '/' . $file))) {
         fm_set_msg(lng('File not found'), 'error');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
     }
 
     $mode = 0;
@@ -1297,7 +1297,7 @@ if (isset($_POST['chmod'], $_POST['token']) && !FM_READONLY && !FM_IS_WIN) {
     }
 
     $FM_PATH = FM_PATH;
-    fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+    fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
 }
 
 /*************************** ACTIONS ***************************/
@@ -1310,7 +1310,7 @@ if (FM_PATH != '') {
 
 // check path
 if (!is_dir($path)) {
-    fm_redirect(FM_SELF_URL . '?p=');
+    fm_redirect(FM_SELF_URL . '?fm=1&p=');
 }
 
 // get parent folder
@@ -1377,11 +1377,11 @@ if (isset($_GET['upload']) && !FM_READONLY) {
             </div>
             <div class="card-body">
                 <p class="card-text">
-                    <a href="?p=<?php echo FM_PATH ?>" class="float-right"><i class="fa fa-chevron-circle-left go-back"></i> <?php echo lng('Back') ?></a>
+                    <a href="?fm=1&p=<?php echo FM_PATH ?>" class="float-right"><i class="fa fa-chevron-circle-left go-back"></i> <?php echo lng('Back') ?></a>
                     <strong><?php echo lng('DestinationFolder') ?></strong>: <?php echo fm_enc(fm_convert_win(FM_PATH)) ?>
                 </p>
 
-                <form action="<?php echo htmlspecialchars(FM_SELF_URL) . '?p=' . fm_enc(FM_PATH) ?>" class="dropzone card-tabs-container" id="fileUploader" enctype="multipart/form-data">
+                <form action="<?php echo htmlspecialchars(FM_SELF_URL) . '?fm=1&p=' . fm_enc(FM_PATH) ?>" class="dropzone card-tabs-container" id="fileUploader" enctype="multipart/form-data">
                     <input type="hidden" name="p" value="<?php echo fm_enc(FM_PATH) ?>">
                     <input type="hidden" name="fullpath" id="fullpath" value="<?php echo fm_enc(FM_PATH) ?>">
                     <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
@@ -1454,7 +1454,7 @@ if (isset($_POST['copy']) && !FM_READONLY) {
     if (!is_array($copy_files) || empty($copy_files)) {
         fm_set_msg(lng('Nothing selected'), 'alert');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
     }
 
     fm_show_header(); // HEADER
@@ -1483,7 +1483,7 @@ if (isset($_POST['copy']) && !FM_READONLY) {
                         <label for="js-move-files" class="custom-control-label ms-2"><?php echo lng('Move') ?></label>
                     </p>
                     <p>
-                        <b><a href="?p=<?php echo urlencode(FM_PATH) ?>" class="btn btn-outline-danger"><i class="fa fa-times-circle"></i> <?php echo lng('Cancel') ?></a></b>&nbsp;
+                        <b><a href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>" class="btn btn-outline-danger"><i class="fa fa-times-circle"></i> <?php echo lng('Cancel') ?></a></b>&nbsp;
                         <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
                         <button type="submit" class="btn btn-success"><i class="fa fa-check-circle"></i> <?php echo lng('Copy') ?></button>
                     </p>
@@ -1503,7 +1503,7 @@ if (isset($_GET['copy']) && !isset($_GET['finish']) && !FM_READONLY) {
     if ($copy == '' || !file_exists(FM_ROOT_PATH . '/' . $copy)) {
         fm_set_msg(lng('File not found'), 'error');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
     }
 
     fm_show_header(); // HEADER
@@ -1516,22 +1516,22 @@ if (isset($_GET['copy']) && !isset($_GET['finish']) && !FM_READONLY) {
             <strong>Destination folder:</strong> <?php echo fm_enc(fm_convert_win(FM_ROOT_PATH . '/' . FM_PATH)) ?>
         </p>
         <p>
-            <b><a href="?p=<?php echo urlencode(FM_PATH) ?>&amp;copy=<?php echo urlencode($copy) ?>&amp;finish=1"><i class="fa fa-check-circle"></i> Copy</a></b> &nbsp;
-            <b><a href="?p=<?php echo urlencode(FM_PATH) ?>&amp;copy=<?php echo urlencode($copy) ?>&amp;finish=1&amp;move=1"><i class="fa fa-check-circle"></i> Move</a></b> &nbsp;
-            <b><a href="?p=<?php echo urlencode(FM_PATH) ?>" class="text-danger"><i class="fa fa-times-circle"></i> Cancel</a></b>
+            <b><a href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;copy=<?php echo urlencode($copy) ?>&amp;finish=1"><i class="fa fa-check-circle"></i> Copy</a></b> &nbsp;
+            <b><a href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;copy=<?php echo urlencode($copy) ?>&amp;finish=1&amp;move=1"><i class="fa fa-check-circle"></i> Move</a></b> &nbsp;
+            <b><a href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>" class="text-danger"><i class="fa fa-times-circle"></i> Cancel</a></b>
         </p>
         <p><i><?php echo lng('Select folder') ?></i></p>
         <ul class="folders break-word">
             <?php
             if ($parent !== false) {
             ?>
-                <li><a href="?p=<?php echo urlencode($parent) ?>&amp;copy=<?php echo urlencode($copy) ?>"><i class="fa fa-chevron-circle-left"></i> ..</a></li>
+                <li><a href="?fm=1&p=<?php echo urlencode($parent) ?>&amp;copy=<?php echo urlencode($copy) ?>"><i class="fa fa-chevron-circle-left"></i> ..</a></li>
             <?php
             }
             foreach ($folders as $f) {
             ?>
                 <li>
-                    <a href="?p=<?php echo urlencode(trim(FM_PATH . '/' . $f, '/')) ?>&amp;copy=<?php echo urlencode($copy) ?>"><i class="fa fa-folder-o"></i> <?php echo fm_convert_win($f) ?></a>
+                    <a href="?fm=1&p=<?php echo urlencode(trim(FM_PATH . '/' . $f, '/')) ?>&amp;copy=<?php echo urlencode($copy) ?>"><i class="fa fa-folder-o"></i> <?php echo fm_convert_win($f) ?></a>
                 </li>
             <?php
             }
@@ -1553,7 +1553,7 @@ if (isset($_GET['settings']) && !FM_READONLY) {
         <div class="card mb-2" data-bs-theme="<?php echo FM_THEME; ?>">
             <h6 class="card-header d-flex justify-content-between">
                 <span><i class="fa fa-cog"></i> <?php echo lng('Settings') ?></span>
-                <a href="?p=<?php echo FM_PATH ?>" class="text-danger"><i class="fa fa-times-circle-o"></i> <?php echo lng('Cancel') ?></a>
+                <a href="?fm=1&p=<?php echo FM_PATH ?>" class="text-danger"><i class="fa fa-times-circle-o"></i> <?php echo lng('Cancel') ?></a>
             </h6>
             <div class="card-body">
                 <form id="js-settings-form" action="" method="post" data-type="ajax" onsubmit="return save_settings(this)">
@@ -1646,7 +1646,7 @@ if (isset($_GET['help'])) {
         <div class="card mb-2" data-bs-theme="<?php echo FM_THEME; ?>">
             <h6 class="card-header d-flex justify-content-between">
                 <span><i class="fa fa-exclamation-circle"></i> <?php echo lng('Help') ?></span>
-                <a href="?p=<?php echo FM_PATH ?>" class="text-danger"><i class="fa fa-times-circle-o"></i> <?php echo lng('Cancel') ?></a>
+                <a href="?fm=1&p=<?php echo FM_PATH ?>" class="text-danger"><i class="fa fa-times-circle-o"></i> <?php echo lng('Cancel') ?></a>
             </h6>
             <div class="card-body">
                 <div class="row">
@@ -1701,7 +1701,7 @@ if (isset($_GET['view'])) {
     if ($file == '' || !is_file($path . '/' . $file) || !fm_is_exclude_items($file, $path . '/' . $file)) {
         fm_set_msg(lng('File not found'), 'error');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
     }
 
     fm_show_header(); // HEADER
@@ -1796,12 +1796,12 @@ if (isset($_GET['view'])) {
                 ?>
             </ul>
             <div class="btn-group btn-group-sm flex-wrap" role="group">
-                <form method="post" class="d-inline mb-0 btn btn-outline-primary" action="?p=<?php echo urlencode(FM_PATH) ?>&amp;dl=<?php echo urlencode($file) ?>">
+                <form method="post" class="d-inline mb-0 btn btn-outline-primary" action="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;dl=<?php echo urlencode($file) ?>">
                     <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
                     <button type="submit" class="btn btn-link btn-sm text-decoration-none fw-bold p-0"><i class="fa fa-cloud-download"></i> <?php echo lng('Download') ?></button> &nbsp;
                 </form>
                 <?php if (!FM_READONLY): ?>
-                    <a class="fw-bold btn btn-outline-primary" title="<?php echo lng('Delete') ?>" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;del=<?php echo urlencode($file) ?>" onclick="confirmDailog(event, 1209, '<?php echo lng('Delete') . ' ' . lng('File'); ?>','<?php echo urlencode($file); ?>', this.href);"> <i class="fa fa-trash"></i> Delete</a>
+                    <a class="fw-bold btn btn-outline-primary" title="<?php echo lng('Delete') ?>" href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;del=<?php echo urlencode($file) ?>" onclick="confirmDailog(event, 1209, '<?php echo lng('Delete') . ' ' . lng('File'); ?>','<?php echo urlencode($file); ?>', this.href);"> <i class="fa fa-trash"></i> Delete</a>
                 <?php endif; ?>
                 <a class="fw-bold btn btn-outline-primary" href="<?php echo fm_enc($file_url) ?>" target="_blank"><i class="fa fa-external-link-square"></i> <?php echo lng('Open') ?></a></b>
                 <?php
@@ -1824,14 +1824,14 @@ if (isset($_GET['view'])) {
                 }
                 if ($is_text && !FM_READONLY) {
                 ?>
-                    <a class="fw-bold btn btn-outline-primary" href="?p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>" class="edit-file">
+                    <a class="fw-bold btn btn-outline-primary" href="?fm=1&p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>" class="edit-file">
                         <i class="fa fa-pencil-square"></i> <?php echo lng('Edit') ?>
                     </a>
-                    <a class="fw-bold btn btn-outline-primary" href="?p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>&env=ace"
+                    <a class="fw-bold btn btn-outline-primary" href="?fm=1&p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>&env=ace"
                         class="edit-file"><i class="fa fa-pencil-square"></i> <?php echo lng('AdvancedEditor') ?>
                     </a>
                 <?php } ?>
-                <a class="fw-bold btn btn-outline-primary" href="?p=<?php echo urlencode(FM_PATH) ?>"><i class="fa fa-chevron-circle-left go-back"></i> <?php echo lng('Back') ?></a>
+                <a class="fw-bold btn btn-outline-primary" href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>"><i class="fa fa-chevron-circle-left go-back"></i> <?php echo lng('Back') ?></a>
             </div>
             <div class="row mt-3">
                 <?php
@@ -1907,7 +1907,7 @@ if (isset($_GET['edit']) && !FM_READONLY) {
     if ($file == '' || !is_file($path . '/' . $file) || !fm_is_exclude_items($file, $path . '/' . $file)) {
         fm_set_msg(lng('File not found'), 'error');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
     }
     $editFile = ' : <i><b>' . $file . '</b></i>';
     header('X-XSS-Protection:0');
@@ -1972,15 +1972,15 @@ if (isset($_GET['edit']) && !FM_READONLY) {
             </div>
             <div class="edit-file-actions col-xs-12 col-sm-7 col-lg-6 text-end pt-1">
                 <div class="btn-group">
-                    <a title=" <?php echo lng('Back') ?>" class="btn btn-sm btn-outline-primary" href="?p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;view=<?php echo urlencode($file) ?>"><i class="fa fa-reply-all"></i> <?php echo lng('Back') ?></a>
+                    <a title=" <?php echo lng('Back') ?>" class="btn btn-sm btn-outline-primary" href="?fm=1&p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;view=<?php echo urlencode($file) ?>"><i class="fa fa-reply-all"></i> <?php echo lng('Back') ?></a>
                     <a title="<?php echo lng('BackUp') ?>" class="btn btn-sm btn-outline-primary" href="javascript:void(0);" onclick="backup('<?php echo urlencode(trim(FM_PATH)) ?>','<?php echo urlencode($file) ?>')"><i class="fa fa-database"></i> <?php echo lng('BackUp') ?></a>
                     <?php if ($is_text) { ?>
                         <?php if ($isNormalEditor) { ?>
-                            <a title="Advanced" class="btn btn-sm btn-outline-primary" href="?p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>&amp;env=ace"><i class="fa fa-pencil-square-o"></i> <?php echo lng('AdvancedEditor') ?></a>
+                            <a title="Advanced" class="btn btn-sm btn-outline-primary" href="?fm=1&p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>&amp;env=ace"><i class="fa fa-pencil-square-o"></i> <?php echo lng('AdvancedEditor') ?></a>
                             <button type="button" class="btn btn-sm btn-success" name="Save" data-url="<?php echo fm_enc($file_url) ?>" onclick="edit_save(this,'nrl')"><i class="fa fa-floppy-o"></i> Save
                             </button>
                         <?php } else { ?>
-                            <a title="Plain Editor" class="btn btn-sm btn-outline-primary" href="?p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>"><i class="fa fa-text-height"></i> <?php echo lng('NormalEditor') ?></a>
+                            <a title="Plain Editor" class="btn btn-sm btn-outline-primary" href="?fm=1&p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>"><i class="fa fa-text-height"></i> <?php echo lng('NormalEditor') ?></a>
                             <button type="button" class="btn btn-sm btn-success" name="Save" data-url="<?php echo fm_enc($file_url) ?>" onclick="edit_save(this,'ace')"><i class="fa fa-floppy-o"></i> <?php echo lng('Save') ?>
                             </button>
                         <?php } ?>
@@ -2012,7 +2012,7 @@ if (isset($_GET['chmod']) && !FM_READONLY && !FM_IS_WIN) {
     if ($file == '' || (!is_file($path . '/' . $file) && !is_dir($path . '/' . $file))) {
         fm_set_msg(lng('File not found'), 'error');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
     }
 
     fm_show_header(); // HEADER
@@ -2066,7 +2066,7 @@ if (isset($_GET['chmod']) && !FM_READONLY && !FM_IS_WIN) {
 
                     <p>
                         <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
-                        <b><a href="?p=<?php echo urlencode(FM_PATH) ?>" class="btn btn-outline-primary"><i class="fa fa-times-circle"></i> <?php echo lng('Cancel') ?></a></b>&nbsp;
+                        <b><a href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>" class="btn btn-outline-primary"><i class="fa fa-times-circle"></i> <?php echo lng('Cancel') ?></a></b>&nbsp;
                         <button type="submit" class="btn btn-success"><i class="fa fa-check-circle"></i> <?php echo lng('Change') ?></button>
                     </p>
                 </form>
@@ -2119,7 +2119,7 @@ $all_files_size = 0;
             ?>
                 <tr><?php if (!FM_READONLY): ?>
                         <td class="nosort"></td><?php endif; ?>
-                    <td class="border-0" data-sort><a href="?p=<?php echo urlencode($parent) ?>"><i class="fa fa-chevron-circle-left go-back"></i> ..</a></td>
+                    <td class="border-0" data-sort><a href="?fm=1&p=<?php echo urlencode($parent) ?>"><i class="fa fa-chevron-circle-left go-back"></i> ..</a></td>
                     <td class="border-0" data-order></td>
                     <td class="border-0" data-order></td>
                     <td class="border-0"></td>
@@ -2172,7 +2172,7 @@ $all_files_size = 0;
                     <?php endif; ?>
                     <td data-sort=<?php echo fm_convert_win(fm_enc($f)) ?>>
                         <div class="filename">
-                            <a href="?p=<?php echo urlencode(trim(FM_PATH . '/' . $f, '/')) ?>"><i class="<?php echo $img ?>"></i> <?php echo fm_convert_win(fm_enc($f)) ?></a>
+                            <a href="?fm=1&p=<?php echo urlencode(trim(FM_PATH . '/' . $f, '/')) ?>"><i class="<?php echo $img ?>"></i> <?php echo fm_convert_win(fm_enc($f)) ?></a>
                             <?php echo ($is_link ? ' &rarr; <i>' . readlink($path . '/' . $f) . '</i>' : '') ?>
                         </div>
                     </td>
@@ -2182,16 +2182,16 @@ $all_files_size = 0;
                     <td data-order="a-<?php echo $date_sorting; ?>"><?php echo $modif ?></td>
                     <?php if (!FM_IS_WIN && !$hide_Cols): ?>
                         <td>
-                            <?php if (!FM_READONLY): ?><a title="Change Permissions" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;chmod=<?php echo urlencode($f) ?>"><?php echo $perms ?></a><?php else: ?><?php echo $perms ?><?php endif; ?>
+                            <?php if (!FM_READONLY): ?><a title="Change Permissions" href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;chmod=<?php echo urlencode($f) ?>"><?php echo $perms ?></a><?php else: ?><?php echo $perms ?><?php endif; ?>
                         </td>
                         <td>
                             <?php echo $owner['name'] . ':' . $group['name'] ?>
                         </td>
                     <?php endif; ?>
                     <td class="inline-actions"><?php if (!FM_READONLY): ?>
-                            <a title="<?php echo lng('Delete') ?>" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;del=<?php echo urlencode($f) ?>" onclick="confirmDailog(event, '1028','<?php echo lng('Delete') . ' ' . lng('Folder'); ?>','<?php echo urlencode($f) ?>', this.href);"> <i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                            <a title="<?php echo lng('Delete') ?>" href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;del=<?php echo urlencode($f) ?>" onclick="confirmDailog(event, '1028','<?php echo lng('Delete') . ' ' . lng('Folder'); ?>','<?php echo urlencode($f) ?>', this.href);"> <i class="fa fa-trash-o" aria-hidden="true"></i></a>
                             <a title="<?php echo lng('Rename') ?>" href="#" onclick="rename('<?php echo fm_enc(addslashes(FM_PATH)) ?>', '<?php echo fm_enc(addslashes($f)) ?>');return false;"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                            <a title="<?php echo lng('CopyTo') ?>..." href="?p=&amp;copy=<?php echo urlencode(trim(FM_PATH . '/' . $f, '/')) ?>"><i class="fa fa-files-o" aria-hidden="true"></i></a>
+                            <a title="<?php echo lng('CopyTo') ?>..." href="?fm=1&p=&amp;copy=<?php echo urlencode(trim(FM_PATH . '/' . $f, '/')) ?>"><i class="fa fa-files-o" aria-hidden="true"></i></a>
                         <?php endif; ?>
                         <a title="<?php echo lng('DirectLink') ?>" href="<?php echo fm_enc(FM_ROOT_URL . (FM_PATH != '' ? '/' . FM_PATH : '') . '/' . $f . '/') ?>" target="_blank"><i class="fa fa-link" aria-hidden="true"></i></a>
                     </td>
@@ -2209,7 +2209,7 @@ $all_files_size = 0;
                 $date_sorting = strtotime(date("F d Y H:i:s.", $modif_raw));
                 $filesize_raw = fm_get_size($path . '/' . $f);
                 $filesize = fm_get_filesize($filesize_raw);
-                $filelink = '?p=' . urlencode(FM_PATH) . '&amp;view=' . urlencode($f);
+                $filelink = '?fm=1&p=' . urlencode(FM_PATH) . '&amp;view=' . urlencode($f);
                 $all_files_size += $filesize_raw;
                 $perms = substr(decoct(fileperms($path . '/' . $f)), -4);
                 $owner = array('name' => '?');
@@ -2260,19 +2260,19 @@ $all_files_size = 0;
                         </span></td>
                     <td data-order="b-<?php echo $date_sorting; ?>"><?php echo $modif ?></td>
                     <?php if (!FM_IS_WIN && !$hide_Cols): ?>
-                        <td><?php if (!FM_READONLY): ?><a title="<?php echo 'Change Permissions' ?>" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;chmod=<?php echo urlencode($f) ?>"><?php echo $perms ?></a><?php else: ?><?php echo $perms ?><?php endif; ?>
+                        <td><?php if (!FM_READONLY): ?><a title="<?php echo 'Change Permissions' ?>" href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;chmod=<?php echo urlencode($f) ?>"><?php echo $perms ?></a><?php else: ?><?php echo $perms ?><?php endif; ?>
                         </td>
                         <td><?php echo fm_enc($owner['name'] . ':' . $group['name']) ?></td>
                     <?php endif; ?>
                     <td class="inline-actions">
                         <?php if (!FM_READONLY): ?>
-                            <a title="<?php echo lng('Delete') ?>" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;del=<?php echo urlencode($f) ?>" onclick="confirmDailog(event, 1209, '<?php echo lng('Delete') . ' ' . lng('File'); ?>','<?php echo urlencode($f); ?>', this.href);"> <i class="fa fa-trash-o"></i></a>
+                            <a title="<?php echo lng('Delete') ?>" href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;del=<?php echo urlencode($f) ?>" onclick="confirmDailog(event, 1209, '<?php echo lng('Delete') . ' ' . lng('File'); ?>','<?php echo urlencode($f); ?>', this.href);"> <i class="fa fa-trash-o"></i></a>
                             <a title="<?php echo lng('Rename') ?>" href="#" onclick="rename('<?php echo fm_enc(addslashes(FM_PATH)) ?>', '<?php echo fm_enc(addslashes($f)) ?>');return false;"><i class="fa fa-pencil-square-o"></i></a>
                             <a title="<?php echo lng('CopyTo') ?>..."
-                                href="?p=<?php echo urlencode(FM_PATH) ?>&amp;copy=<?php echo urlencode(trim(FM_PATH . '/' . $f, '/')) ?>"><i class="fa fa-files-o"></i></a>
+                                href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;copy=<?php echo urlencode(trim(FM_PATH . '/' . $f, '/')) ?>"><i class="fa fa-files-o"></i></a>
                         <?php endif; ?>
                         <a title="<?php echo lng('DirectLink') ?>" href="<?php echo fm_enc(FM_ROOT_URL . (FM_PATH != '' ? '/' . FM_PATH : '') . '/' . $f) ?>" target="_blank"><i class="fa fa-link"></i></a>
-                        <a title="<?php echo lng('Download') ?>" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;dl=<?php echo urlencode($f) ?>" onclick="confirmDailog(event, 1211, '<?php echo lng('Download'); ?>','<?php echo urlencode($f); ?>', this.href);"><i class="fa fa-download"></i></a>
+                        <a title="<?php echo lng('Download') ?>" href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;dl=<?php echo urlencode($f) ?>" onclick="confirmDailog(event, 1211, '<?php echo lng('Download'); ?>','<?php echo urlencode($f); ?>', this.href);"><i class="fa fa-download"></i></a>
                     </td>
                 </tr>
             <?php
@@ -3360,7 +3360,7 @@ function fm_download_file($fileLocation, $fileName, $chunkSize  = 1024)
     if ($size == 0) {
         fm_set_msg(lng('Zero byte file! Aborting download'), 'error');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
 
         return (false);
     }
@@ -3371,7 +3371,7 @@ function fm_download_file($fileLocation, $fileName, $chunkSize  = 1024)
     if ($fp === false) {
         fm_set_msg(lng('Cannot open file! Aborting download'), 'error');
         $FM_PATH = FM_PATH;
-        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        fm_redirect(FM_SELF_URL . '?fm=1&p=' . urlencode($FM_PATH));
         return (false);
     }
 
@@ -3705,7 +3705,7 @@ function fm_show_nav_path($path)
 
             <?php
             $path = fm_clean_path($path);
-            $root_url = "<a href='?p='><i class='fa fa-home' aria-hidden='true' title='" . FM_ROOT_PATH . "'></i></a>";
+            $root_url = "<a href='?fm=1&p='><i class='fa fa-home' aria-hidden='true' title='" . FM_ROOT_PATH . "'></i></a>";
             $sep = '<i class="bread-crumb"> / </i>';
             if ($path != '') {
                 $exploded = explode('/', $path);
@@ -3715,7 +3715,7 @@ function fm_show_nav_path($path)
                 for ($i = 0; $i < $count; $i++) {
                     $parent = trim($parent . '/' . $exploded[$i], '/');
                     $parent_enc = urlencode($parent);
-                    $array[] = "<a href='?p={$parent_enc}'>" . fm_enc(fm_convert_win($exploded[$i])) . "</a>";
+                    $array[] = "<a href='?fm=1&p={$parent_enc}'>" . fm_enc(fm_convert_win($exploded[$i])) . "</a>";
                 }
                 $root_url .= $sep . implode($sep, $array);
             }
@@ -3740,7 +3740,7 @@ function fm_show_nav_path($path)
                     </li>
                     <?php if (!FM_READONLY): ?>
                         <li class="nav-item">
-                            <a title="<?php echo lng('Upload') ?>" class="nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;upload"><i class="fa fa-cloud-upload" aria-hidden="true"></i> <?php echo lng('Upload') ?></a>
+                            <a title="<?php echo lng('Upload') ?>" class="nav-link" href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;upload"><i class="fa fa-cloud-upload" aria-hidden="true"></i> <?php echo lng('Upload') ?></a>
                         </li>
                         <li class="nav-item">
                             <a title="<?php echo lng('NewItem') ?>" class="nav-link" href="#createNewItem" data-bs-toggle="modal" data-bs-target="#createNewItem"><i class="fa fa-plus-square"></i> <?php echo lng('NewItem') ?></a>
@@ -3754,16 +3754,16 @@ function fm_show_nav_path($path)
 
                             <div class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="navbarDropdownMenuLink-5" data-bs-theme="<?php echo FM_THEME; ?>">
                                 <?php if (!FM_READONLY): ?>
-                                    <a title="<?php echo lng('Settings') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;settings=1"><i class="fa fa-cog" aria-hidden="true"></i> <?php echo lng('Settings') ?></a>
+                                    <a title="<?php echo lng('Settings') ?>" class="dropdown-item nav-link" href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;settings=1"><i class="fa fa-cog" aria-hidden="true"></i> <?php echo lng('Settings') ?></a>
                                 <?php endif ?>
-                                <a title="<?php echo lng('Help') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;help=2"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <?php echo lng('Help') ?></a>
+                                <a title="<?php echo lng('Help') ?>" class="dropdown-item nav-link" href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;help=2"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <?php echo lng('Help') ?></a>
                                 <a title="<?php echo lng('Logout') ?>" class="dropdown-item nav-link" href="?logout=1"><i class="fa fa-sign-out" aria-hidden="true"></i> <?php echo lng('Logout') ?></a>
                             </div>
                         </li>
                     <?php else: ?>
                         <?php if (!FM_READONLY): ?>
                             <li class="nav-item">
-                                <a title="<?php echo lng('Settings') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;settings=1"><i class="fa fa-cog" aria-hidden="true"></i> <?php echo lng('Settings') ?></a>
+                                <a title="<?php echo lng('Settings') ?>" class="dropdown-item nav-link" href="?fm=1&p=<?php echo urlencode(FM_PATH) ?>&amp;settings=1"><i class="fa fa-cog" aria-hidden="true"></i> <?php echo lng('Settings') ?></a>
                             </li>
                         <?php endif; ?>
                     <?php endif; ?>
@@ -5001,7 +5001,7 @@ function fm_show_header_login()
             function search_template(data) {
                 var response = "";
                 $.each(data, function(key, val) {
-                    response += `<li><a href="?p=${val.path}&view=${val.name}">${val.path}/${val.name}</a></li>`;
+                    response += `<li><a href="?fm=1&p=${val.path}&view=${val.name}">${val.path}/${val.name}</a></li>`;
                 });
                 return response;
             }
